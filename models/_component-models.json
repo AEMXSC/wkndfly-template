@@ -208,6 +208,125 @@
         "value": "",
         "label": "Text",
         "valueType": "string"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "ctalabel",
+        "label": "CTA Button Label",
+        "description": "Text shown on the call-to-action button. Leave empty to hide the button.",
+        "value": ""
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "ctalink",
+        "label": "CTA Button Link",
+        "description": "Target page or URL for the call-to-action button."
+      },
+      {
+        "component": "select",
+        "name": "ctastyle",
+        "label": "CTA Style",
+        "valueType": "string",
+        "value": "button",
+        "options": [
+          {
+            "name": "Primary Button",
+            "value": "button"
+          },
+          {
+            "name": "Secondary Button",
+            "value": "button-secondary"
+          },
+          {
+            "name": "Dark Button",
+            "value": "button-dark"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "name": "layout",
+        "label": "Layout Style",
+        "valueType": "string",
+        "value": "default",
+        "options": [
+          { "name": "Default", "value": "default" },
+          { "name": "Articles", "value": "articles" }
+        ]
+      },
+      {
+        "component": "select",
+        "name": "style",
+        "label": "Style",
+        "options": [
+          {
+            "name": "default",
+            "value": ""
+          },
+          {
+            "name": "Image Top",
+            "value": "image-top"
+          },
+          {
+            "name": "Image Bottom",
+            "value": "image-bottom"
+          },
+          {
+            "name": "Image Left",
+            "value": "image-left"
+          },
+          {
+            "name": "Image Right",
+            "value": "image-right"
+          },
+          {
+            "name": "Teaser Overlay",
+            "value": "teaser-overlay"
+          },
+          {
+            "name": "Teaser Card",
+            "value": "teaser-card"
+          },
+          {
+            "name": "Icon Cards",
+            "value": "icon-cards"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "name": "imagestyle",
+        "label": "Image Style",
+        "valueType": "string",
+        "value": "",
+        "options": [
+          {
+            "name": "Cover (default)",
+            "value": ""
+          },
+          {
+            "name": "Contain",
+            "value": "contain"
+          },
+          {
+            "name": "Fill",
+            "value": "fill"
+          },
+          {
+            "name": "None",
+            "value": "none"
+          },
+          {
+            "name": "Scale Down",
+            "value": "scale-down"
+          },
+          {
+            "name": "Compact Style",
+            "value": "compact-style"
+          }
+        ]
       }
     ]
   },
@@ -263,6 +382,311 @@
         "value": "",
         "label": "Text",
         "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "fragment-list",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "title",
+        "label": "Title",
+        "value": ""
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "subtitle",
+        "label": "Subtitle",
+        "value": ""
+      },
+      {
+        "component": "select",
+        "name": "layout",
+        "label": "Layout Style",
+        "valueType": "string",
+        "value": "grid",
+        "options": [
+          { "name": "Grid", "value": "grid" },
+          { "name": "List", "value": "list" },
+          { "name": "Compact", "value": "compact" },
+          { "name": "Masonry", "value": "masonry" },
+          { "name": "Carousel", "value": "carousel" },
+          { "name": "Articles", "value": "articles" }
+        ]
+      },
+      {
+        "component": "select",
+        "name": "dataSourceType",
+        "label": "Data Source Type",
+        "valueType": "string",
+        "value": "content-fragments",
+        "options": [
+          { "name": "Content Fragments", "value": "content-fragments" },
+          { "name": "External API", "value": "api" }
+        ]
+      },
+      {
+        "component": "aem-content",
+        "name": "contentFragmentFolder",
+        "label": "Content Fragment Folder",
+        "description": "Select folder containing Content Fragments",
+        "valueType": "string",
+        "validation": { "rootPath": "/content/dam" },
+        "condition": { "==": [{ "var": "dataSourceType" }, "content-fragments"] }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "modelName",
+        "label": "Content Fragment Model Name",
+        "description": "Target CF model name to filter by (e.g. content-card)",
+        "condition": { "==": [{ "var": "dataSourceType" }, "content-fragments"] }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "apiUrl",
+        "label": "API URL",
+        "description": "External API endpoint for data",
+        "condition": { "==": [{ "var": "dataSourceType" }, "api"] }
+      },
+      {
+        "component": "boolean",
+        "name": "enableFilters",
+        "label": "Enable Filters",
+        "description": "Show the search and filter panel",
+        "value": false,
+        "valueType": "boolean"
+      },
+      {
+        "component": "boolean",
+        "name": "enableTextSearch",
+        "label": "Enable Text Search",
+        "description": "Show full-text search input",
+        "value": true,
+        "valueType": "boolean",
+        "condition": { "==": [{ "var": "enableFilters" }, true] }
+      },
+      {
+        "component": "boolean",
+        "name": "enableTagFilter",
+        "label": "Enable Tag Filter",
+        "description": "Show tag-based filter dropdown",
+        "value": true,
+        "valueType": "boolean",
+        "condition": { "==": [{ "var": "enableFilters" }, true] }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "searchPlaceholder",
+        "label": "Search Placeholder",
+        "value": "Search...",
+        "description": "Placeholder text for the search input",
+        "condition": { "==": [{ "var": "enableFilters" }, true] }
+      },
+      {
+        "component": "boolean",
+        "name": "showTags",
+        "label": "Show Tags",
+        "description": "Show content fragment tags on each card",
+        "value": false,
+        "valueType": "boolean",
+        "condition": { "==": [{ "var": "dataSourceType" }, "content-fragments"] }
+      },
+      {
+        "component": "select",
+        "name": "ctastyle",
+        "label": "CTA Style",
+        "valueType": "string",
+        "value": "button",
+        "options": [
+          {
+            "name": "Primary Button",
+            "value": "button"
+          },
+          {
+            "name": "Secondary Button",
+            "value": "button-secondary"
+          },
+          {
+            "name": "Dark Button",
+            "value": "button-dark"
+          },
+          {
+            "name": "Link",
+            "value": "link"
+          }
+        ]
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "noResultsMessage",
+        "label": "No Results Message",
+        "value": "No items found",
+        "description": "Message displayed when no content fragments match"
+      },
+      {
+        "component": "text",
+        "name": "custom-class",
+        "label": "Custom class",
+        "value": "",
+        "valueType": "string",
+        "description": "Space-separated class names to add to the block"
+      }
+    ]
+  },
+  {
+    "id": "flights",
+    "fields": [
+      {
+        "component": "aem-content-fragment",
+        "name": "flightdropdowncontentfragment",
+        "label": "Flight Dropdown Content Fragment",
+        "description": "Select the CF containing the flight dropdown content fragment",
+        "valueType": "string",
+        "validation": {
+          "rootPath": "/content/dam"
+        }
+      },
+      {
+        "component": "aem-content-fragment",
+        "name": "flightlistcontentfragment",
+        "label": "Flight List Content Fragment",
+        "description": "Select the CF containing the flight list content",
+        "valueType": "string",
+        "validation": {
+          "rootPath": "/content/dam"
+        }
+      },
+      {
+        "component": "text",
+        "name": "buttoneventtype",
+        "label": "Button Event Type",
+        "value": "",
+        "valueType": "string"
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "checkoutpath",
+        "label": "Checkout Page Path",
+        "description": "Page to redirect to when user clicks Book Now. Defaults to /en/checkout if not set."
+      },
+      {
+        "component": "text",
+        "name": "custom-class",
+        "label": "Custom class",
+        "value": "",
+        "valueType": "string",
+        "description": "Space-separated class names to add to the block"
+      }
+    ]
+  },
+  {
+    "id": "create-account",
+    "fields": [
+      {
+        "component": "select",
+        "name": "variant",
+        "label": "Variant",
+        "value": "default",
+        "valueType": "string",
+        "options": [
+          {
+            "name": "Default",
+            "value": "default"
+          },
+          {
+            "name": "Extended Preferences",
+            "value": "extended-preferences"
+          },
+          {
+            "name": "Compact Contact",
+            "value": "compact-contact"
+          },
+          {
+            "name": "Membership",
+            "value": "membership"
+          }
+        ]
+      },
+      {
+        "component": "boolean",
+        "name": "showaddress",
+        "label": "Show Address Fields",
+        "value": "true",
+        "valueType": "boolean",
+        "description": "Show or hide the address, ZIP code, and city fields."
+      },
+      {
+        "component": "boolean",
+        "name": "showdateofbirth",
+        "label": "Show Date of Birth Field",
+        "value": "true",
+        "valueType": "boolean",
+        "description": "Show or hide the date of birth field."
+      },
+      {
+        "component": "boolean",
+        "name": "showloyaltyprogram",
+        "label": "Show Loyalty Program",
+        "value": "false",
+        "valueType": "boolean"
+      },
+      {
+        "component": "boolean",
+        "name": "showcommunicationpreferences",
+        "label": "Show Communication Preferences",
+        "value": "true",
+        "valueType": "boolean"
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "redirectUrl",
+        "label": "Redirect URL",
+        "description": "Page to redirect to after successful account creation. Leave empty for no redirect."
+      },
+      {
+        "component": "text",
+        "name": "buttoneventtype",
+        "label": "Button Event Type",
+        "value": "",
+        "valueType": "string"
+      },
+      {
+        "component": "text",
+        "name": "buttonwebhookurl",
+        "label": "Button Webhook URL",
+        "value": "",
+        "valueType": "string"
+      },
+      {
+        "component": "text",
+        "name": "buttonformid",
+        "label": "Button Form ID",
+        "value": "",
+        "valueType": "string"
+      },
+      {
+        "component": "aem-content",
+        "name": "buttondata",
+        "label": "Button Data Sheet",
+        "valueType": "string",
+        "description": "AEM sheet path whose key/value rows are sent on submit"
+      },
+      {
+        "component": "text",
+        "name": "custom-class",
+        "label": "Custom class",
+        "value": "",
+        "valueType": "string",
+        "description": "Space-separated class names to add to the block"
       }
     ]
   },

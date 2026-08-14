@@ -1,102 +1,87 @@
+/*
+ * Dynamic Media video — smart crop
+ *
+ * How smart crop decides what to show:
+ * The DM SmartCropManager compares THIS BLOCK's clientWidth/clientHeight against
+ * the crop ratios authored on the asset, picks the closest one, then sets the
+ * <video> element's inline width/height to the frame's intrinsic pixel size and
+ * applies a scale()/translate() transform so only the crop region is visible.
+ *
+ * Three rules follow from that:
+ *
+ * 1. Never give `.dynamic-media-video video` a width, height, max-width or
+ *    object-fit. Those clamp or refit the box the transform was calculated
+ *    against, so the wrong region is shown.
+ *
+ * 2. The block needs a definite, non-16:9 box for any cropping to happen. With
+ *    no height of its own the block inherits the player's 16:9 padding box,
+ *    which always resolves to the Widescreen crop — the full, uncropped frame.
+ *    That is why smart crop appears to do nothing without the rules below.
+ *
+ * 3. Size the box with aspect-ratio, not a fixed pixel height, and do not add
+ *    max-height. A fixed height drifts away from the intended ratio as the
+ *    viewport widens, and a vh cap makes the ratio depend on window height —
+ *    both silently change which crop gets selected.
+ *
+ * The ratios map exactly onto the crops Dynamic Media generated for the asset
+ * (Widescreen 16:9, Standard 4:3, Square 1:1, VerticalFeed 4:5, Vertical 9:16),
+ * so selection is exact rather than approximate. Change the breakpoints freely,
+ * but keep each value equal to one of the authored crop ratios.
+ */
+
 .dynamic-media-video {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
   position: relative;
+  width: 100%;
   z-index: 1;
   overflow: hidden;
-}
-
-.dynamic-media-video video {
-  max-width: 100%;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-}
-
-/* Video.js fluid override — let the container's fixed height govern sizing */
-.dynamic-media-video .video-js.vjs-fluid {
-  padding-top: 0 !important;
-  width: 100%;
-  height: 100%;
-}
-
-.dynamic-media-video[data-video-loaded='false'] {
-  aspect-ratio: 16 / 9;
-  background-color: #f0f0f0;
-}
-
-.dynamic-media-video[data-video-loaded='error'] {
-  aspect-ratio: 16 / 9;
-  background-color: #f8d7da;
+  aspect-ratio: 16 / 9; /* Widescreen — full frame */
 }
 
 .dynamic-media-video-wrapper {
-  text-align: center;
   width: 100%;
   position: relative;
   z-index: 1;
 }
 
-/*
- * Smart-crop rendition-based fixed heights
- * ─────────────────────────────────────────
- * The DM smart-crop player selects the best rendition for the container size.
- * Heights below are derived from each rendition's aspect ratio at the
- * breakpoint's minimum viewport width, keeping the container predictable
- * and avoiding layout shift.
- *
- * Rendition        Ratio   Breakpoint   Height derivation
- * Widescreen       16:9    ≥1200px      1200 × 9/16 = 675px
- * Standard          4:3    900–1199px    900 × 3/4  = 675px
- * Square            1:1    600–899px     600 × 1/1  = 600px
- * VerticalFeed      4:5    480–599px     480 × 5/4  = 600px
- * Vertical          9:16   <480px        capped at  600px (avoids overflow)
- */
-
-/* Widescreen 16:9 — large screens (desktop) */
-@media (min-width: 1200px) {
+/* Standard 4:3 — landscape tablets */
+@media (max-width: 1199px) {
   .dynamic-media-video {
-    width: 100%;
-    height: 675px;
-    max-height: 80vh;
+    aspect-ratio: 4 / 3;
   }
 }
 
-/* Standard 4:3 — medium screens (landscape tablets) */
-@media (min-width: 900px) and (max-width: 1199px) {
+/* Square 1:1 — small tablets / large phones */
+@media (max-width: 899px) {
   .dynamic-media-video {
-    width: 100%;
-    height: 675px;
-    max-height: 80vh;
+    aspect-ratio: 1 / 1;
   }
 }
 
-/* Square 1:1 — small tablets / large phones (landscape) */
-@media (min-width: 600px) and (max-width: 899px) {
+/* VerticalFeed 4:5 — phones */
+@media (max-width: 599px) {
   .dynamic-media-video {
-    width: 100%;
-    height: 620px;
-    max-height: 85vh;
-  }
-}
-
-/* VerticalFeed 4:5 — phones (portrait) */
-@media (min-width: 480px) and (max-width: 599px) {
-  .dynamic-media-video {
-    width: 100%;
-    height: 620px;
-    max-height: 85vh;
+    aspect-ratio: 4 / 5;
   }
 }
 
 /* Vertical 9:16 — narrow phones */
 @media (max-width: 479px) {
   .dynamic-media-video {
-    width: 100%;
-    height: 620px;
-    max-height: 85vh;
+    aspect-ratio: 9 / 16;
   }
+}
+
+/*
+ * The player must fill the block, so the box the manager measures is the box the
+ * video is drawn into. vjs-fluid is the current default and would otherwise
+ * impose its own 16:9 padding box; vjs-fill applies if the viewer is ever passed
+ * fill: true.
+ */
+.dynamic-media-video .video-js {
+  width: 100%;
+  height: 100%;
+}
+
+.dynamic-media-video .video-js.vjs-fluid {
+  padding-top: 0;
 }

@@ -97,6 +97,11 @@
 
   /* nav height */
   --nav-height: 64px;
+
+  /* actual rendered header height (header is always position: fixed;
+     this is the fixed offset reserved for content when the "Push Content
+     Below Header" page property is on) */
+  --header-height: 90px;
 }
 
 /* fallback fonts */
@@ -392,12 +397,21 @@ body.blue-theme header .nav-wrapper nav .nav-sections ul > li > a:hover{
 /*theme header-footer*/
 header {
   height: var(--nav-height);
-  min-height: 90px;
+  min-height: var(--header-height);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 111;
+}
+
+/* Page property "Push Content Below Header" toggle: the "static-header"
+   class is added to <header> itself (see scripts.js loadEager). The header
+   stays fixed/pinned at all times (it never re-enters normal flow), so
+   instead of relying on document flow, reserve a fixed offset above the
+   following <main> equal to the header's actual rendered height. */
+header.static-header + main {
+  padding-top: var(--header-height);
 }
 
 header .header,
@@ -854,6 +868,20 @@ main .section > picture.section-bg img.sec-img {
   height: 100%;
   object-fit: cover;
 }
+
+/* Fit modes */
+main .section > picture.section-bg.fit-cover img.sec-img { object-fit: cover; }
+main .section > picture.section-bg.fit-contain img.sec-img { object-fit: contain; }
+main .section > picture.section-bg.fit-fill img.sec-img { object-fit: fill; }
+main .section > picture.section-bg.fit-none img.sec-img { object-fit: none; width: auto; height: auto; }
+
+/* Focal point / object-position */
+main .section > picture.section-bg.pos-center img.sec-img { object-position: center; }
+main .section > picture.section-bg.pos-top img.sec-img { object-position: top; }
+main .section > picture.section-bg.pos-bottom img.sec-img { object-position: bottom; }
+main .section > picture.section-bg.pos-left img.sec-img { object-position: left; }
+main .section > picture.section-bg.pos-right img.sec-img { object-position: right; }
+
 main .section.section-has-bg > div {
   position: relative;
   z-index: 1;

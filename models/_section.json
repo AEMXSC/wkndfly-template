@@ -105,7 +105,7 @@
           "label": "Background Image",
           "name": "container",
           "valueType": "string",
-          "collapsible": true,
+          "collapsible": false,
           "condition": {
             "==": [{ "var": "style" }, "bg-image"]
           },
@@ -118,20 +118,33 @@
               "multi": false
             },
             {
-              "component": "reference",
+              "component": "select",
               "valueType": "string",
-              "name": "tab-image",
-              "label": "Tablet Image",
-              "description": "Background image will be used on tablet by default.",
-              "multi": false
+              "name": "imageFit",
+              "label": "Image Fit",
+              "description": "How the background image fills the section area.",
+              "value": "fill",
+              "options": [
+                { "name": "Fill (recommended, crops to fit)", "value": "fill" },
+                { "name": "Contain (full image, may have gaps)", "value": "contain" },
+                { "name": "Stretch (fills exactly, may distort)", "value": "stretch" },
+                { "name": "Original (natural size, no scaling)", "value": "original" }
+              ]
             },
             {
-              "component": "reference",
+              "component": "select",
               "valueType": "string",
-              "name": "mob-image",
-              "label": "Mobile Image",
-              "description": "Background / Tablet image will be used on mobile by default.",
-              "multi": false
+              "name": "imagePosition",
+              "label": "Focal Point",
+              "description": "Which part of the image stays visible when cropped.",
+              "value": "center",
+              "options": [
+                { "name": "Center", "value": "center" },
+                { "name": "Top", "value": "top" },
+                { "name": "Bottom", "value": "bottom" },
+                { "name": "Left", "value": "left" },
+                { "name": "Right", "value": "right" }
+              ]
             }
           ]
         },
