@@ -4,13 +4,13 @@ import { readBlockConfig } from '../../scripts/aem.js';
 import { dispatchCustomEvent } from '../../scripts/custom-events.js';
 import { getEnvironmentValue, getHostname, resolveImageUrl } from '../../scripts/utils.js';
 
-const AUTHOR_GRAPHQL_BASE_For_Search = '/graphql/execute.json/wkndfly-template/flight-details-list-with-path';
+const AUTHOR_GRAPHQL_BASE_For_Search = '/graphql/execute.json/ref-demo-eds/flight-details-list-with-path';
 const PUBLISH_GRAPHQL_BASE_For_Search = 'https://675172-referencedemopartner-stage.adobeioruntime.net/api/v1/web/dx-excshell-1/flight-details-list';
 
-const AUTHOR_GRAPHQL_BASE_For_Destination = '/graphql/execute.json/wkndfly-template/flight-details-list-for-destination-page-with-path';
+const AUTHOR_GRAPHQL_BASE_For_Destination = '/graphql/execute.json/ref-demo-eds/flight-details-list-for-destination-page-with-path';
 const PUBLISH_GRAPHQL_BASE_For_Destination = 'https://675172-referencedemopartner-stage.adobeioruntime.net/api/v1/web/dx-excshell-1/flight-details-list';
 
-const AUTHOR_GRAPHQL_BASE_For_Dropdown = '/graphql/execute.json/wkndfly-template/flight-source-dropdown';
+const AUTHOR_GRAPHQL_BASE_For_Dropdown = '/graphql/execute.json/ref-demo-eds/flight-source-dropdown';
 const PUBLISH_GRAPHQL_BASE_For_Dropdown = 'https://675172-referencedemopartner-stage.adobeioruntime.net/api/v1/web/dx-excshell-1/flight-source-dropdown';
 const DEFAULT_FLIGHT_LIST_CONTENT_FRAGMENT_PATH = '/content/dam/wkndfly-template/en/fragments/flight-details';
 
