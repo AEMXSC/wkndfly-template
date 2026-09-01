@@ -668,6 +668,26 @@ export default async function decorate(block) {
 
   block.classList.add('flights');
 
+  // Search results: from and to explicitly present (URL params or datalayer) take priority over
+  // path-based destination detection, since a genuine destination page never carries both from and
+  // to (this also covers the case where the results page itself lives under /en/destinations/).
+  if (resolved.from && resolved.to) {
+    const route = `${resolved.from}-${resolved.to}`;
+    let flights = [];
+    try {
+      flights = await fetchFlightsFromGraphQL(resolved.from, resolved.to);
+    } catch (_) {
+      // keep flights = []
+    }
+    displayFlightResults(flights, resolved.from, resolved.to, urlDate);
+    addBookNowBar(block);
+    const selectedFromUrl = getSelectedFlights();
+    if (selectedFromUrl.length > 0) {
+      updateDataLayerWithSelectedFlights(selectedFromUrl[selectedFromUrl.length - 1]);
+    }
+    return;
+  }
+
   // Destination page: path contains /en/destinations/ — no from/to; GraphQL expects airport code(s)
   if (isDestinationPage()) {
     const destinationCodes = getDestinationCodesFromPath();
@@ -687,24 +707,6 @@ export default async function decorate(block) {
     const noResultsToLabel = getDestinationLabelFromPageTitle() || destinationLabel || 'destination';
     const toLabel = flights.length === 0 ? noResultsToLabel : (destinationLabel || 'destination');
     displayFlightResults(flights, '', toLabel, urlDate);
-    addBookNowBar(block);
-    const selectedFromUrl = getSelectedFlights();
-    if (selectedFromUrl.length > 0) {
-      updateDataLayerWithSelectedFlights(selectedFromUrl[selectedFromUrl.length - 1]);
-    }
-    return;
-  }
-
-  // Search page: from and to always present (URL params or datalayer)
-  if (resolved.from && resolved.to) {
-    const route = `${resolved.from}-${resolved.to}`;
-    let flights = [];
-    try {
-      flights = await fetchFlightsFromGraphQL(resolved.from, resolved.to);
-    } catch (_) {
-      // keep flights = []
-    }
-    displayFlightResults(flights, resolved.from, resolved.to, urlDate);
     addBookNowBar(block);
     const selectedFromUrl = getSelectedFlights();
     if (selectedFromUrl.length > 0) {
