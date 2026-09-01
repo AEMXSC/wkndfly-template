@@ -4,13 +4,13 @@ import { readBlockConfig } from '../../scripts/aem.js';
 import { dispatchCustomEvent } from '../../scripts/custom-events.js';
 import { getEnvironmentValue, getHostname, resolveImageUrl } from '../../scripts/utils.js';
 
-const AUTHOR_GRAPHQL_BASE_For_Search = '/graphql/execute.json/wkndfly-template/flight-details-list-with-path';
+const AUTHOR_GRAPHQL_BASE_For_Search = '/graphql/execute.json/ref-demo-eds/flight-details-list-with-path';
 const PUBLISH_GRAPHQL_BASE_For_Search = 'https://675172-referencedemopartner-stage.adobeioruntime.net/api/v1/web/dx-excshell-1/flight-details-list';
 
-const AUTHOR_GRAPHQL_BASE_For_Destination = '/graphql/execute.json/wkndfly-template/flight-details-list-for-destination-page-with-path';
+const AUTHOR_GRAPHQL_BASE_For_Destination = '/graphql/execute.json/ref-demo-eds/flight-details-list-for-destination-page-with-path';
 const PUBLISH_GRAPHQL_BASE_For_Destination = 'https://675172-referencedemopartner-stage.adobeioruntime.net/api/v1/web/dx-excshell-1/flight-details-list';
 
-const AUTHOR_GRAPHQL_BASE_For_Dropdown = '/graphql/execute.json/wkndfly-template/flight-source-dropdown';
+const AUTHOR_GRAPHQL_BASE_For_Dropdown = '/graphql/execute.json/ref-demo-eds/flight-source-dropdown';
 const PUBLISH_GRAPHQL_BASE_For_Dropdown = 'https://675172-referencedemopartner-stage.adobeioruntime.net/api/v1/web/dx-excshell-1/flight-source-dropdown';
 const DEFAULT_FLIGHT_LIST_CONTENT_FRAGMENT_PATH = '/content/dam/wkndfly-template/en/fragments/flight-details';
 
@@ -668,6 +668,26 @@ export default async function decorate(block) {
 
   block.classList.add('flights');
 
+  // Search results: from and to explicitly present (URL params or datalayer) take priority over
+  // path-based destination detection, since a genuine destination page never carries both from and
+  // to (this also covers the case where the results page itself lives under /en/destinations/).
+  if (resolved.from && resolved.to) {
+    const route = `${resolved.from}-${resolved.to}`;
+    let flights = [];
+    try {
+      flights = await fetchFlightsFromGraphQL(resolved.from, resolved.to);
+    } catch (_) {
+      // keep flights = []
+    }
+    displayFlightResults(flights, resolved.from, resolved.to, urlDate);
+    addBookNowBar(block);
+    const selectedFromUrl = getSelectedFlights();
+    if (selectedFromUrl.length > 0) {
+      updateDataLayerWithSelectedFlights(selectedFromUrl[selectedFromUrl.length - 1]);
+    }
+    return;
+  }
+
   // Destination page: path contains /en/destinations/ — no from/to; GraphQL expects airport code(s)
   if (isDestinationPage()) {
     const destinationCodes = getDestinationCodesFromPath();
@@ -687,24 +707,6 @@ export default async function decorate(block) {
     const noResultsToLabel = getDestinationLabelFromPageTitle() || destinationLabel || 'destination';
     const toLabel = flights.length === 0 ? noResultsToLabel : (destinationLabel || 'destination');
     displayFlightResults(flights, '', toLabel, urlDate);
-    addBookNowBar(block);
-    const selectedFromUrl = getSelectedFlights();
-    if (selectedFromUrl.length > 0) {
-      updateDataLayerWithSelectedFlights(selectedFromUrl[selectedFromUrl.length - 1]);
-    }
-    return;
-  }
-
-  // Search page: from and to always present (URL params or datalayer)
-  if (resolved.from && resolved.to) {
-    const route = `${resolved.from}-${resolved.to}`;
-    let flights = [];
-    try {
-      flights = await fetchFlightsFromGraphQL(resolved.from, resolved.to);
-    } catch (_) {
-      // keep flights = []
-    }
-    displayFlightResults(flights, resolved.from, resolved.to, urlDate);
     addBookNowBar(block);
     const selectedFromUrl = getSelectedFlights();
     if (selectedFromUrl.length > 0) {

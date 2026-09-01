@@ -36,7 +36,10 @@
       "title",
       "title-block",
       "video",
+      "confirmation",
+      "checkout",
       "create-account",
+      "sign-in",
       "fragment-list",
       "flights",
       "join-us",
@@ -65,7 +68,10 @@
       "text",
       "title",
       "title-block",
-      "video"
+      "video",
+      "join-us",
+      "fragment-list",
+      "create-account"
     ]
   }
 ]

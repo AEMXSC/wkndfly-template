@@ -11,32 +11,35 @@
       "accordion",
       "action-button",
       "button",
+      "button",
       "cards",
       "carousel",
       "columns",
       "contentfragment",
       "download-list",
+      "dm-asset",
       "dm-template",
-      "dynamic-media-image",
-      "dynamic-media-video",
+      "embed-adaptive-form",
+      "find-a-doctor",
+      "forex",
+      "form",
       "fragment",
       "hero",
       "image",
       "promotion",
       "quote",
+      "search",
+      "separator",
+      "tabs",
       "teaser",
       "text",
       "title",
       "title-block",
       "video",
-      "search",
-      "separator",
-      "tabs",
-      "form",
-      "forex",
-      "embed-adaptive-form",
-      "find-a-doctor",
+      "confirmation",
+      "checkout",
       "create-account",
+      "sign-in",
       "fragment-list",
       "flights",
       "join-us",
@@ -44,19 +47,7 @@
     ]
   },
   {
-    "id": "accordion",
-    "components": [
-      "accordion-item"
-    ]
-  },
-  {
     "id": "cards",
-    "components": [
-      "card"
-    ]
-  },
-  {
-    "id": "carousel",
     "components": [
       "card"
     ]
@@ -71,48 +62,16 @@
     "id": "column",
     "components": [
       "button",
+      "dm-asset",
+      "dm-template",
       "image",
       "text",
       "title",
       "title-block",
       "video",
-      "dynamic-media-video"
-    ]
-  },
-  {
-    "id": "tabs",
-    "components": [
-      "tabs-item"
-    ]
-  },
-  {
-    "id": "form",
-    "components": [
-      "captcha",
-      "checkbox",
-      "checkbox-group",
-      "date-input",
-      "drop-down",
-      "email",
-      "file-input",
-      "form-accordion",
-      "form-button",
-      "form-fragment",
-      "form-image",
-      "form-modal",
-      "form-reset-button",
-      "form-submit-button",
-      "number-input",
-      "panel",
-      "password",
-      "plain-text",
-      "radio-group",
-      "rating",
-      "telephone-input",
-      "text-input",
-      "tnc",
-      "wizard",
-      "range"
+      "join-us",
+      "fragment-list",
+      "create-account"
     ]
   }
 ]
