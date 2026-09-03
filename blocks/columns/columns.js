@@ -107,11 +107,6 @@ export default async function decorate(block) {
   // Blocks (e.g. Join Us) dropped inside a column render with the block markup
   // already in place, but sit too deep for aem.js's decorateBlocks() to find them,
   // so their JS/CSS never loads. Find and load them here instead.
-  const nestedBlockPromises = [];
-  block.querySelectorAll('div.block').forEach((nestedBlock) => {
-    decorateBlock(nestedBlock);
-    nestedBlockPromises.push(loadBlock(nestedBlock));
-  });
 
   // setup image columns
   [...block.children].forEach((row) => {
@@ -181,6 +176,12 @@ export default async function decorate(block) {
           row.setAttribute('blockName', componentName);
         }
       }
+    });
+
+    const nestedBlockPromises = [];
+    block.querySelectorAll('div.block').forEach((nestedBlock) => {
+      decorateBlock(nestedBlock);
+      nestedBlockPromises.push(loadBlock(nestedBlock));
     });
   });
 
