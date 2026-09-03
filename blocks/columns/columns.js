@@ -1,3 +1,5 @@
+import { decorateBlock, loadBlock } from '../../scripts/aem.js';
+
 function embedYoutube(url, autoplay, background) {
   const usp = new URLSearchParams(url.search);
   let suffix = '';
@@ -99,9 +101,18 @@ function isVideoLink(link) {
     }
 }
 
-export default function decorate(block) {
+export default async function decorate(block) {
   const cols = [...block.firstElementChild.children];
   block.classList.add(`columns-${cols.length}-cols`);
+
+  // Blocks (e.g. Join Us) dropped inside a column render with the block markup
+  // already in place, but sit too deep for aem.js's decorateBlocks() to find them,
+  // so their JS/CSS never loads. Find and load them here instead.
+  const nestedBlockPromises = [];
+  block.querySelectorAll('div.block').forEach((nestedBlock) => {
+    decorateBlock(nestedBlock);
+    nestedBlockPromises.push(loadBlock(nestedBlock));
+  });
 
   // setup image columns
   [...block.children].forEach((row) => {
@@ -154,4 +165,6 @@ export default function decorate(block) {
       }
     });
   });
+
+  await Promise.all(nestedBlockPromises);
 }
