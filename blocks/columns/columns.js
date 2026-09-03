@@ -172,9 +172,9 @@ export default async function decorate(block) {
           || Array.from(componentRoot?.classList || []).find((className) => className !== 'block');
 
         if (componentName) {
-          row.classList.add('block');
-          row.dataset.blockName = componentName;
-          row.setAttribute('blockName', componentName);
+          componentRoot.classList.add('block');
+          componentRoot.dataset.blockName = componentName;
+          componentRoot.setAttribute('blockName', componentName);
         }
       }
     });
