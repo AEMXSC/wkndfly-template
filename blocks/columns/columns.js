@@ -163,14 +163,14 @@ export default async function decorate(block) {
         }
       }
 
-      const customClassConfig = Array.from(col.querySelectorAll('div')).find((el) => {
+      const customClassConfig = Array.from(row.querySelectorAll('div')).find((el) => {
         if (el.children.length < 2) return false;
         const [keyCell, valueCell] = el.children;
         return keyCell.textContent.trim() === 'custom-class' && valueCell.textContent.trim() === 'block';
       });
 
       if (customClassConfig) {
-        const componentRoot = col.querySelector(':scope > [data-aue-component], :scope > [data-aue-model], :scope > .block');
+        const componentRoot = row.querySelector(':scope > [data-aue-component], :scope > [data-aue-model], :scope > .block');
         const componentName = componentRoot?.getAttribute('data-aue-component')
           || componentRoot?.getAttribute('data-aue-model')
           || Array.from(componentRoot?.classList || []).find((className) => className !== 'block');
