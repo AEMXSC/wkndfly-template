@@ -166,7 +166,7 @@ export default async function decorate(block) {
       });
 
       if (customClassConfig) {
-        const componentRoot = customClassConfig.parentElement;
+        const componentRoot = customClassConfig.parentElement; // comment
         const componentName = componentRoot?.getAttribute('data-aue-component')
           || componentRoot?.getAttribute('data-aue-model')
           || Array.from(componentRoot?.classList || []).find((className) => className !== 'block');
