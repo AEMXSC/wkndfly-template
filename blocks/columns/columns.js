@@ -108,6 +108,7 @@ export default async function decorate(block) {
   // already in place, but sit too deep for aem.js's decorateBlocks() to find them,
   // so their JS/CSS never loads. Find and load them here instead.
 
+  const nestedBlockPromises = [];
   // setup image columns
   [...block.children].forEach((row) => {
     row.classList.add('columns-row');
@@ -178,7 +179,6 @@ export default async function decorate(block) {
       }
     });
 
-    const nestedBlockPromises = [];
     block.querySelectorAll('div.block').forEach((nestedBlock) => {
       decorateBlock(nestedBlock);
       nestedBlockPromises.push(loadBlock(nestedBlock));
