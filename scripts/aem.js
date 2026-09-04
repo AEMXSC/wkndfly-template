@@ -670,8 +670,9 @@ async function loadBlock(block) {
  * @param {Element} block The block element
  */
 function decorateBlock(block) {
-  const shortBlockName = block.classList[0];
+  const shortBlockName = block.classList[0] || block.dataset.aueModel;
   if (shortBlockName && !block.dataset.blockStatus) {
+    block.classList.add(shortBlockName);
     block.classList.add('block');
     block.dataset.blockName = shortBlockName;
     block.dataset.blockStatus = 'initialized';
@@ -691,6 +692,9 @@ function decorateBlock(block) {
  */
 function decorateBlocks(main) {
   main.querySelectorAll('div.section > div > div').forEach(decorateBlock);
+  // nested blocks authored inside another block (e.g. a custom block in columns)
+  main.querySelectorAll('.block div[data-aue-model]:not([data-block-status])')
+    .forEach(decorateBlock);
 }
 
 /**
