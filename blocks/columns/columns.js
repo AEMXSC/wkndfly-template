@@ -1,3 +1,5 @@
+import { decorateBlock, loadBlock } from '../../scripts/aem.js';
+
 function embedYoutube(url, autoplay, background) {
   const usp = new URLSearchParams(url.search);
   let suffix = '';
@@ -108,6 +110,14 @@ export default function decorate(block) {
     row.classList.add('columns-row');
     //const firstChild = row.querySelector(':scope > div:first-child');
     [...row.children].forEach((col) => {
+      // decorate any nested block authored inside a column (e.g. a custom block).
+      // block name comes from the delivered wrapper's own class — nothing hard-coded.
+      const nestedBlock = col.querySelector(':scope > div[class]:not([data-block-status])');
+      if (nestedBlock && nestedBlock.classList.length) {
+        decorateBlock(nestedBlock);
+        loadBlock(nestedBlock);
+      }
+
       const pic = col.querySelector('picture');
       if (pic) {
         const picWrapper = pic.closest('div');
