@@ -665,6 +665,7 @@ async function loadBlock(block) {
   return block;
 }
 
+
 /**
  * Decorates a block.
  * @param {Element} block The block element
