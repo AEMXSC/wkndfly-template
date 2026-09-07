@@ -100,38 +100,70 @@ function isVideoLink(link) {
   }
 }
 
-// Render a block authored inside a column.
-// A: proper nested wrapper (<div class="join-us">…rows…) -> decorate + load.
-// B: flattened <p>key</p><p>value</p> pairs -> rebuild rows; block name comes
-//    from the authored `custom-class` value (generic, nothing hard-coded).
-function decorateNestedBlock(col) {
-  const existing = col.querySelector(':scope > div[class]:not([data-block-status])');
-  if (existing && existing.classList.length) {
-    decorateBlock(existing);
-    loadBlock(existing);
-    return;
+/**
+ * Load the component model registry (served at site root) once and cache it.
+ * Each entry maps a model id to the Set of its field names, used to recognise a
+ * key-value block that a column delivered flattened (no class/markup).
+ * @returns {Promise<Array<{id:string, fields:Set<string>}>>}
+ */
+function loadComponentModels() {
+  if (!window.hlxComponentModels) {
+    window.hlxComponentModels = fetch('/component-models.json')
+      .then((resp) => (resp.ok ? resp.json() : []))
+      .then((models) => (Array.isArray(models) ? models : [])
+        .map((m) => ({ id: m.id, fields: new Set((m.fields || []).map((f) => f.name)) })))
+      .catch(() => []);
   }
-  const ps = [...col.querySelectorAll(':scope > p')];
-  if (ps.length < 2 || ps.length % 2 !== 0) return;
-  const pairs = [];
-  for (let i = 0; i < ps.length; i += 2) pairs.push([ps[i].textContent.trim(), ps[i + 1]]);
-  const custom = pairs.find(([k]) => k.toLowerCase() === 'custom-class');
-  const blockName = custom && custom[1].textContent.trim();
-  if (!blockName) return;
+  return window.hlxComponentModels;
+}
+
+/**
+ * A column cell is a candidate flattened block when its only content is an even run
+ * of <p> elements (key/value pairs). Normal rich-text columns contain other markup
+ * (lists, headings, pictures) and are excluded.
+ * @param {Element} col the column cell
+ * @returns {string[]|null} the candidate keys (even-indexed <p> text), or null
+ */
+function flattenedKeys(col) {
+  const children = [...col.children];
+  if (children.length < 2 || children.length % 2 !== 0) return null;
+  if (!children.every((el) => el.tagName === 'P')) return null;
+  return children.filter((_, i) => i % 2 === 0).map((p) => p.textContent.trim());
+}
+
+/**
+ * Preview/publish path: a key-value block (e.g. Join Us) dropped inside a column is
+ * delivered flattened as <p>key</p><p>value</p> pairs, WITHOUT its block class or row
+ * structure (author keeps data-aue instrumentation, so this isn't needed there).
+ * Identify the block by matching the delivered keys against the model registry, then
+ * rebuild the proper block DOM. Fully generic — no block name or field is hard-coded.
+ * @param {Element} col the column cell
+ * @param {Array<{id:string, fields:Set<string>}>} models the model registry
+ * @returns {Element|null} the rebuilt block element, or null if unrecognised
+ */
+function rebuildFlattenedBlock(col, models) {
+  const keys = flattenedKeys(col);
+  if (!keys) return null;
+  // the block is the model that declares every delivered key (most specific wins)
+  const match = models
+    .filter((m) => m.fields.size && keys.every((k) => m.fields.has(k)))
+    .sort((a, b) => a.fields.size - b.fields.size)[0];
+  if (!match) return null;
+
+  const ps = [...col.children];
   const nested = document.createElement('div');
-  nested.classList.add(blockName);
-  pairs.forEach(([key, valEl]) => {
-    const row = document.createElement('div');
-    const k = document.createElement('div');
-    k.textContent = key;
-    const v = document.createElement('div');
-    v.append(valEl.cloneNode(true));
-    row.append(k, v);
-    nested.append(row);
-  });
+  nested.classList.add(match.id);
+  for (let i = 0; i < ps.length; i += 2) {
+    const rowEl = document.createElement('div');
+    const keyCell = document.createElement('div');
+    keyCell.textContent = ps[i].textContent.trim();
+    const valCell = document.createElement('div');
+    valCell.append(ps[i + 1].cloneNode(true));
+    rowEl.append(keyCell, valCell);
+    nested.append(rowEl);
+  }
   col.replaceChildren(nested);
-  decorateBlock(nested);
-  loadBlock(nested);
+  return nested;
 }
 
 export default async function decorate(block) {
@@ -143,23 +175,28 @@ export default async function decorate(block) {
   // so their JS/CSS never loads. Find and load them here instead.
 
   const nestedBlockPromises = [];
+
+  // Preview/publish: any column delivered as a flattened key-value block is rebuilt into
+  // real block markup, identified via the model registry. No-op in author / for text cols.
+  const candidateCols = [...block.querySelectorAll(':scope > div > div')].filter(flattenedKeys);
+  if (candidateCols.length) {
+    const models = await loadComponentModels();
+    candidateCols.forEach((col) => rebuildFlattenedBlock(col, models));
+  }
+
   // setup image columns
   [...block.children].forEach((row) => {
     row.classList.add('columns-row');
     // const firstChild = row.querySelector(':scope > div:first-child');
     [...row.children].forEach((col) => {
-
-      decorateNestedBlock(col);
-      /*
-       // decorate any nested block authored inside a column (e.g. a custom block).
+      // decorate any nested block authored inside a column (e.g. a custom block).
       // block name comes from the delivered wrapper's own class — nothing hard-coded.
       const nestedBlock = col.querySelector(':scope > div[class]:not([data-block-status])');
       if (nestedBlock && nestedBlock.classList.length) {
         decorateBlock(nestedBlock);
         loadBlock(nestedBlock);
       }
-      */
-      
+
       const pic = col.querySelector('picture');
       if (pic) {
         const picWrapper = pic.closest('div');
