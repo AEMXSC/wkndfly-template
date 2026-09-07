@@ -2,66 +2,83 @@ import { createOptimizedPicture } from '../../scripts/aem.js';
 import { moveInstrumentation } from '../../scripts/scripts.js';
 
 export default function decorate(block) {
+  // Read layout from the first card row (field index 5)
+  const firstRow = block.children[0];
+  const layoutDiv = firstRow?.children[5];
+  const layout = layoutDiv?.querySelector('p')?.textContent?.trim()
+    || layoutDiv?.textContent?.trim() || 'default';
+  if (layout !== 'default') {
+    block.classList.add(layout);
+  }
+
   const ul = document.createElement('ul');
   [...block.children].forEach((row) => {
     const li = document.createElement('li');
-    
-    // Read card style from the third div (index 2)
-    const styleDiv = row.children[2];
-    const styleParagraph = styleDiv?.querySelector('p');
-    const cardStyle = styleParagraph?.textContent?.trim() || 'default';
-    if (cardStyle && cardStyle !== 'default') {
-      li.className = cardStyle;
+
+    // Fields: 0=image, 1=text, 2=ctalabel, 3=ctalink, 4=ctastyle, 5=layout, 6=style, 7=imgstyle
+    const ctaLabelDiv = row.children[2];
+    const ctaLabel = ctaLabelDiv?.querySelector('p')?.textContent?.trim()
+      || ctaLabelDiv?.textContent?.trim() || '';
+
+    const ctaLinkDiv = row.children[3];
+    const ctaLinkAnchor = ctaLinkDiv?.querySelector('a');
+    const ctaLink = ctaLinkAnchor?.getAttribute('href')
+      || ctaLinkDiv?.querySelector('p')?.textContent?.trim()
+      || ctaLinkDiv?.textContent?.trim() || '';
+
+    const ctaStyleDiv = row.children[4];
+    const ctaStyle = ctaStyleDiv?.querySelector('p')?.textContent?.trim()
+      || ctaStyleDiv?.textContent?.trim() || 'button';
+
+    const styleDiv = row.children[6];
+    const style = styleDiv?.querySelector('p')?.textContent?.trim()
+      || styleDiv?.textContent?.trim() || '';
+
+    const imageStyleDiv = row.children[7];
+    const imageStyle = imageStyleDiv?.querySelector('p')?.textContent?.trim()
+      || imageStyleDiv?.textContent?.trim() || '';
+
+    if (style) {
+      li.classList.add(style);
     }
-    
-    // Read CTA style from the fourth div (index 3)
-    const ctaDiv = row.children[3];
-    const ctaParagraph = ctaDiv?.querySelector('p');
-    const ctaStyle = ctaParagraph?.textContent?.trim() || 'default';
-    
+
     moveInstrumentation(row, li);
     while (row.firstElementChild) li.append(row.firstElementChild);
-    
-    // Process the li children to identify and style them correctly
+
+    // Process the li children
+    let imageDiv = null;
     [...li.children].forEach((div, index) => {
-      // First div (index 0) - Image
       if (index === 0) {
         div.className = 'cards-card-image';
-      }
-      // Second div (index 1) - Content with button
-      else if (index === 1) {
+        imageDiv = div;
+      } else if (index === 1) {
         div.className = 'cards-card-body';
-      }
-      // Third div (index 2) - Card style configuration
-      else if (index === 2) {
+      } else {
+        // Hide config divs (ctalabel, ctalink, ctastyle, layout, style, imagestyle)
         div.className = 'cards-config';
-        const p = div.querySelector('p');
-        if (p) {
-          p.style.display = 'none'; // Hide the configuration text
-        }
-      }
-      // Fourth div (index 3) - CTA style configuration
-      else if (index === 3) {
-        div.className = 'cards-config';
-        const p = div.querySelector('p');
-        if (p) {
-          p.style.display = 'none'; // Hide the configuration text
-        }
-      }
-      // Any other divs
-      else {
-        div.className = 'cards-card-body';
+        div.style.display = 'none';
       }
     });
-    
-    // Apply CTA styles to button containers
-    const buttonContainers = li.querySelectorAll('p.button-container');
-    buttonContainers.forEach(buttonContainer => {
-      // Remove any existing CTA classes
-      buttonContainer.classList.remove('default', 'cta-button', 'cta-button-secondary', 'cta-button-dark', 'cta-default');
-      // Add the correct CTA class
-      buttonContainer.classList.add(ctaStyle);
-    });
+
+    if (imageStyle && imageDiv) {
+      imageDiv.classList.add(imageStyle);
+    }
+
+    // Render CTA button from label + link fields
+    if (ctaLabel && ctaLink) {
+      const bodyDiv = li.querySelector('.cards-card-body');
+      if (bodyDiv) {
+        const ctaContainer = document.createElement('p');
+        ctaContainer.className = `button-container cta-${ctaStyle}`;
+        const anchor = document.createElement('a');
+        anchor.className = 'button';
+        anchor.href = ctaLink;
+        anchor.title = ctaLabel;
+        anchor.textContent = ctaLabel;
+        ctaContainer.appendChild(anchor);
+        bodyDiv.appendChild(ctaContainer);
+      }
+    }
     
     ul.append(li);
   });

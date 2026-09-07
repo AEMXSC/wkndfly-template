@@ -6,6 +6,12 @@ header .nav-wrapper {
   position: fixed;
 }
 
+/* Page property "Push Content Below Header" toggle is implemented in
+   styles.css (header.static-header + main { padding-top: var(--header-height) }).
+   The header/.nav-wrapper stay fixed at all times — the outer <header>
+   element is always position: fixed (see styles.css), so toggling
+   .nav-wrapper's own position here had no effect on layout flow. */
+
 header nav {
   box-sizing: border-box;
   display: grid;

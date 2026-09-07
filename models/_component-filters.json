@@ -35,7 +35,15 @@
       "text",
       "title",
       "title-block",
-      "video"
+      "video",
+      "confirmation",
+      "checkout",
+      "create-account",
+      "sign-in",
+      "fragment-list",
+      "flights",
+      "join-us",
+      "flight-search"
     ]
   },
   {
@@ -60,7 +68,10 @@
       "text",
       "title",
       "title-block",
-      "video"
+      "video",
+      "join-us",
+      "fragment-list",
+      "create-account"
     ]
   }
 ]

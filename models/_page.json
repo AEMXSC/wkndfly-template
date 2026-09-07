@@ -83,6 +83,13 @@
           ]
       },
       {
+        "component": "boolean",
+        "valueType": "boolean",
+        "name": "staticHeader",
+        "label": "Push Content Below Header",
+        "description": "On: header takes up space and the page content starts below it. Off (default): header overlays the page content, starting from the top."
+      },
+      {
         "component": "text",
         "valueType": "string",
         "name": "js-files",
