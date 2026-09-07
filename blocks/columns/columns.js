@@ -100,6 +100,40 @@ function isVideoLink(link) {
   }
 }
 
+// Render a block authored inside a column.
+// A: proper nested wrapper (<div class="join-us">…rows…) -> decorate + load.
+// B: flattened <p>key</p><p>value</p> pairs -> rebuild rows; block name comes
+//    from the authored `custom-class` value (generic, nothing hard-coded).
+function decorateNestedBlock(col) {
+  const existing = col.querySelector(':scope > div[class]:not([data-block-status])');
+  if (existing && existing.classList.length) {
+    decorateBlock(existing);
+    loadBlock(existing);
+    return;
+  }
+  const ps = [...col.querySelectorAll(':scope > p')];
+  if (ps.length < 2 || ps.length % 2 !== 0) return;
+  const pairs = [];
+  for (let i = 0; i < ps.length; i += 2) pairs.push([ps[i].textContent.trim(), ps[i + 1]]);
+  const custom = pairs.find(([k]) => k.toLowerCase() === 'custom-class');
+  const blockName = custom && custom[1].textContent.trim();
+  if (!blockName) return;
+  const nested = document.createElement('div');
+  nested.classList.add(blockName);
+  pairs.forEach(([key, valEl]) => {
+    const row = document.createElement('div');
+    const k = document.createElement('div');
+    k.textContent = key;
+    const v = document.createElement('div');
+    v.append(valEl.cloneNode(true));
+    row.append(k, v);
+    nested.append(row);
+  });
+  col.replaceChildren(nested);
+  decorateBlock(nested);
+  loadBlock(nested);
+}
+
 export default async function decorate(block) {
   const cols = [...block.firstElementChild.children];
   block.classList.add(`columns-${cols.length}-cols`);
@@ -114,6 +148,9 @@ export default async function decorate(block) {
     row.classList.add('columns-row');
     // const firstChild = row.querySelector(':scope > div:first-child');
     [...row.children].forEach((col) => {
+
+      decorateNestedBlock(col);
+      /*
        // decorate any nested block authored inside a column (e.g. a custom block).
       // block name comes from the delivered wrapper's own class — nothing hard-coded.
       const nestedBlock = col.querySelector(':scope > div[class]:not([data-block-status])');
@@ -121,6 +158,7 @@ export default async function decorate(block) {
         decorateBlock(nestedBlock);
         loadBlock(nestedBlock);
       }
+      */
       
       const pic = col.querySelector('picture');
       if (pic) {
